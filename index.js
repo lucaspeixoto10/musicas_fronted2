@@ -1,32 +1,42 @@
+const urlBackend = "http://localhost:3000"
 
-const urlBackend = "http://localhost:3000";
-
-const listaMusicas = document.getElementById("listaMusicas");
+const listaMusicas = document.getElementById("listaMusicas")
 
 async function buscarMusicas() {
-    const resposta = await fetch(urlBackend);
-
-    const musicas = await resposta.json();
+    const resposta = await fetch(urlBackend)
+    const musicas = await resposta.json()
 
     musicas.forEach((musica) => {
         listaMusicas.innerHTML += `
-            <div class="card">
-                <h3>${musica.titulo}</h3>
-
-                <p>Artista: ${musica.artista}</p>
-
-                <p>Gênero: ${musica.genero}</p>
-
-                <p>Ano: ${musica.ano}</p>
-
-                <p>Duração: ${musica.duracao}</p>
-
-                <a href="editar.html?id=${musica.id}">
-                    Editar
-                </a>
-            </div>
-        `;
-    });
+            <article class="musica">
+                <h2>${musica.titulo}</h2>
+                <p class="artista">${musica.artista}</p>
+                <p class="detalhes">${musica.genero} | ${musica.ano} | ${musica.duracao} min</p>
+                <div class="acoes">
+                    <a class="editar" href="editar.html?id=${musica.id}">Editar</a>
+                    <button class="apagar" onclick="apagarMusica(${musica.id})">Apagar</button>
+                </div>
+            </article>
+        `
+    })
 }
 
-buscarMusicas();
+buscarMusicas()
+
+async function apagarMusica(id) {
+    const confirmou = confirm("Tem certeza que quer apagar essa música?")
+
+    if (!confirmou) {
+        return
+    }
+
+    const resposta = await fetch(`${urlBackend}/apagar/${id}`, {
+        method: "DELETE"
+    })
+
+    const respostaTransformada = await resposta.json()
+
+    alert(respostaTransformada.mensagem)
+
+    window.location.reload()
+}
